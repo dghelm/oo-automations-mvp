@@ -1,0 +1,53 @@
+## OpenOasis Automations
+
+We’re running something similar to a bounty program, where coordination of work will be on a Github Projects page. Project add a webhook to their repo, and our service will detect Issue and PR changes and respond accordingly. Additionally, it will open up Threads on Discord. Lastly, there will be some form of scraping finished PRs, grabbing github handles, and comparing that against a mapping of wallet addresses to prepare payout spreadsheets.
+
+**Current State:** MVP built to test API functionality end-to-end, rough specs
+
+**Immediate Needs:**
+
+- Work with Swag to understand flow
+- Build out missing logic
+- Refactor for better maintenance
+- Deploy to a server
+
+**Test Examples:**
+
+- [Project](https://github.com/orgs/the-raul/projects/1/views/2), [Issue](https://github.com/dghelm/feb2-oa-testing/issues/3) (both private?)
+
+**Libraries Used:**
+
+- [Octokit Webhooks](https://github.com/octokit/webhooks) — handle Issue and PR changes
+- [Octokit Graphql.js](https://github.com/octokit/graphql.js) — update Project board
+- [Sapphire](https://sapphirejs.dev/)  — Discord Bot Framework
+- Can deploy to AWS Ubuntu with Caddy as proxy for webhooks
+
+### Flow Overview
+
+Repo adds webhook triggered by PR and Issues
+
+Take action on receiving webhook triggers
+
+**Repo level:**
+
+- Trigger for issues getting labelled “OpenOasis”
+    - Add to our project board as “Open Bounty”
+    - Create Thread in Discord channel for item discussion
+- Trigger for an issue getting assigned
+    - Change to “In Progress” or “Claimed”
+- Trigger for issue getting unassigned
+    - If no assignees, change to “Open Bounty”
+    - Else, if still an assignee, keep status
+- Trigger for any pr created:
+    - If the issue has “OpenOasis” label, change to In Review
+- Trigger for any PR merged
+    - If the issue has “OpenOasis” label, change to Done
+
+**Project Level:**
+
+- At end, scrape project data and generate spreadsheets for OpenOasis and any partner sponsors
+
+**Discord:**
+
+- Updates should post to relevant threads if possible
+- Some specially formatted box shows overview stats

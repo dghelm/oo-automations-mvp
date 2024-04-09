@@ -13,6 +13,9 @@ import project from './helpers/github-projects.mjs';
 import { SapphireClient } from '@sapphire/framework';
 import { GatewayIntentBits } from 'discord.js';
 
+// Event Handlers
+import { handleGithubEvent } from './handlers/github.mjs';
+
 import * as http from 'http';
 
 // Load our environment variables
@@ -35,42 +38,42 @@ const webhooks = new Webhooks({
   secret: webhookSecret,
 });
 
-const handleIssueEvent = (payload) => {
-  console.log('New Issue Action on repository:', payload.repository.full_name);
-  console.log(payload.action);
-  console.log('Labels:');
-  console.log(payload.issue.labels);
+// const handleIssueEvent = (payload) => {
+//   console.log('New Issue Action on repository:', payload.repository.full_name);
+//   console.log(payload.action);
+//   console.log('Labels:');
+//   console.log(payload.issue.labels);
 
-  // Add issue to project
-  for (const label of payload.issue.labels) {
-    if (label.name === 'OpenOasis') {
-      console.log('Adding issue to project');
-      project.addIssueToProject(payload.issue);
-    }
-  }
+//   // Add issue to project
+//   for (const label of payload.issue.labels) {
+//     if (label.name === 'OpenOasis') {
+//       console.log('Adding issue to project');
+//       project.addIssueToProject(payload.issue);
+//     }
+//   }
 
-  // TODO: if no OpenOasis label, remove from project
-};
+//   // TODO: if no OpenOasis label, remove from project
+// };
 
-const handleGithubEvent = (name, payload) => {
-  switch (name) {
-    case 'issues':
-      console.log('Issue event received');
-      handleIssueEvent(payload);
-      break;
-    default:
-      console.log('Unknown event received');
-  }
-};
+// const handleGithubEvent = (name, payload) => {
+//   switch (name) {
+//     case 'issues':
+//       console.log('Issue event received');
+//       handleIssueEvent(payload);
+//       break;
+//     default:
+//       console.log('Unknown event received');
+//   }
+// };
 
-const client = new SapphireClient({
-  intents: [
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-  ],
-  loadMessageCommandListeners: true,
-});
+// const client = new SapphireClient({
+//   intents: [
+//     GatewayIntentBits.MessageContent,
+//     GatewayIntentBits.Guilds,
+//     GatewayIntentBits.GuildMessages,
+//   ],
+//   loadMessageCommandListeners: true,
+// });
 
 // client.login(discordBotToken);
 
@@ -82,6 +85,7 @@ webhooks.onAny(({ id, name, payload }) => {
 });
 
 http.createServer(createNodeMiddleware(webhooks)).listen(3000);
+// node vs mjs
 // require('http').createServer(createNodeMiddleware(webhooks)).listen(3000);
 // can now receive webhook events at /api/github/webhooks
 
